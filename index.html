@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#08080A" />
+  <title>Diagnóstico Creator Founder</title>
+  <meta name="description" content="Descubre tu perfil exacto y obtén la hoja de ruta personalizada: en qué fase estás y cuál es tu siguiente paso para escalar. Diagnóstico en menos de 2 minutos." />
+  <meta name="robots" content="index,follow" />
+  <!-- Open Graph / Twitter (preview al compartir el enlace) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Creator Founder" />
+  <meta property="og:title" content="Diagnóstico Creator Founder" />
+  <meta property="og:description" content="Descubre tu perfil exacto y tu hoja de ruta personalizada en menos de 2 minutos." />
+  <meta property="og:image" content="assets/logo.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Diagnóstico Creator Founder" />
+  <meta name="twitter:description" content="Descubre tu perfil exacto y tu hoja de ruta personalizada en menos de 2 minutos." />
+  <meta name="twitter:image" content="assets/logo.png" />
+  <link rel="icon" href="assets/logo.png" type="image/png" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
+  <!-- Cuerpo: Open Sauce One (Fontsource · jsDelivr) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-one@5/400.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-one@5/500.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-one@5/600.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-one@5/700.css" />
+  <!-- Titulares: Satoshi (Fontshare) — tipografía de marca Pedro Buerbaum -->
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f%5B%5D=satoshi@400,500,700,900&display=swap" />
+  <link rel="stylesheet" href="styles.css?v=10" />
+</head>
+<body>
+  <!-- ===================== BANNER (solo logo centrado) ===================== -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner nav__inner--center">
+      <a class="nav__logo" href="#top" aria-label="Creator Founder — inicio">
+        <img src="assets/logo.png" alt="Creator Founder" height="36" />
+      </a>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ===================== HERO ===================== -->
+    <section class="hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="container hero__inner">
+        <h1 class="hero__title">Diagnóstico <span class="grad-red">Creator Founder</span></h1>
+        <p class="hero__sub">
+          Descubre tu perfil exacto y obtén la hoja de ruta personalizada en la que te diremos
+          en qué fase te encuentras y cuál es tu siguiente paso para escalar.
+        </p>
+        <span class="hero__duration">⏱ Duración: &lt; 2 minutos</span>
+        <div class="hero__actions">
+          <button class="btn btn--primary btn--lg" data-open-quiz>Empezar mi diagnóstico →</button>
+        </div>
+
+        <!-- VSL (vídeo de presentación) -->
+        <div class="vsl" aria-label="Vídeo de presentación">
+          <div class="vsl__frame">
+            <button class="vsl__play" type="button" aria-label="Reproducir vídeo">
+              <span class="vsl__triangle"></span>
+            </button>
+            <span class="vsl__label">Tu vídeo (VSL) aquí</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PERFILES ===================== -->
+    <section class="section section--alt" id="perfiles">
+      <div class="container">
+        <div class="section__head">
+          <h2 class="section__title">¿Quieres saber cuál eres y en qué etapa estás?</h2>
+        </div>
+        <div class="grid grid--3" id="profilesGrid"><!-- render JS --></div>
+        <div class="section__cta">
+          <button class="btn btn--primary btn--lg" data-open-quiz>Empezar mi diagnóstico →</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <img src="assets/logo.png" alt="Creator Founder" height="32" />
+      <p class="footer__note">Basado en la metodología Shadow Operator. © Creator Founder.</p>
+    </div>
+  </footer>
+
+  <!-- ===================== QUIZ OVERLAY ===================== -->
+  <div class="quiz" id="quiz" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Diagnóstico personalizado">
+    <div class="quiz__bar">
+      <div class="container quiz__bar-inner">
+        <img src="assets/logo.png" alt="Creator Founder" height="30" />
+        <div class="quiz__progress" id="quizProgress" role="progressbar" aria-label="Progreso del diagnóstico" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span style="width:0%"></span></div>
+      </div>
+    </div>
+    <div class="quiz__body container" id="quizBody"><!-- render JS --></div>
+  </div>
+
+  <script src="data.js?v=9"></script>
+  <script src="app.js?v=9"></script>
+</body>
+</html>
