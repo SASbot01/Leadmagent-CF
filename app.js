@@ -18,6 +18,61 @@
   const esc = (s) =>
     String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+  /* ---------------- Lead → Supabase (tabla all_leads) ----------------
+     Sitio estático: escribe directo a PostgREST con la anon key (config.js) y
+     una policy RLS de solo-insert. Mismo formato que el repo Next.js
+     (project=creatorfounder, source=diagnostico) para que los leads de ambos
+     sitios queden idénticos. Best-effort: no bloquea la UI ni el localStorage. */
+  function splitName(name) {
+    const t = String(name || "").trim().replace(/\s+/g, " ");
+    if (!t) return { first_name: "", last_name: "" };
+    const p = t.split(" ");
+    return { first_name: p[0], last_name: p.length > 1 ? p.slice(1).join(" ") : "" };
+  }
+  function collectUtms() {
+    const out = {};
+    try {
+      for (const [k, v] of new URLSearchParams(location.search)) {
+        if (/^utm_/i.test(k)) out[k] = v;
+      }
+    } catch (_) {}
+    return out;
+  }
+  async function sendLeadToSupabase(payload) {
+    const cfg = window.CF_CONFIG || {};
+    const url = cfg.SUPABASE_URL;
+    const key = cfg.SUPABASE_ANON_KEY;
+    if (!url || !key) {
+      console.warn("[lead] Supabase sin configurar (falta anon key en config.js) — el lead solo queda en localStorage");
+      return false;
+    }
+    try {
+      const res = await fetch(`${url}/rest/v1/all_leads`, {
+        method: "POST",
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({
+          project: cfg.PROJECT_SLUG || "creatorfounder",
+          source: "diagnostico",
+          payload,
+        }),
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        console.error("[lead] Supabase respondió error", res.status, text.slice(0, 300));
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error("[lead] fallo al enviar a Supabase", err);
+      return false;
+    }
+  }
+
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---------------- Landing: nav scroll state ---------------- */
@@ -404,19 +459,29 @@
 
     focusTitle();
 
-    // Persistencia local del lead con sus datos de contacto (placeholder hasta CRM/backend).
+    // Lead → Supabase (all_leads) + copia local de respaldo.
+    const { first_name, last_name } = splitName(contact.name);
+    const leadPayload = {
+      name: contact.name || "",
+      first_name,
+      last_name,
+      email: (contact.email || "").trim().toLowerCase(),
+      phone: contact.phone || "",
+      profile: r.profile,
+      phase: r.phase,
+      reto: r.reto || "",
+      stage_name: stage.name || "",
+      source: "diagnostico",
+      submitted_at: new Date().toISOString(),
+      ...collectUtms(),
+    };
+    // Best-effort: no bloquea el render del resultado.
+    sendLeadToSupabase(leadPayload);
+
+    // Copia local de respaldo (por si el envío falla o Supabase no está configurado).
     try {
       const leads = JSON.parse(localStorage.getItem("cf_leads") || "[]");
-      leads.push({
-        name: contact.name || "",
-        phone: contact.phone || "",
-        email: contact.email || "",
-        profile: r.profile,
-        phase: r.phase,
-        stage: stage.name,
-        reto: r.reto || null,
-        ts: Date.now(),
-      });
+      leads.push({ ...leadPayload, ts: Date.now() });
       localStorage.setItem("cf_leads", JSON.stringify(leads));
     } catch (_) {}
 
