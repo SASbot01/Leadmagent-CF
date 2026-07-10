@@ -16,4 +16,11 @@ window.CF_CONFIG = {
   SUPABASE_ANON_KEY:
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZlYWFrb21vbWd1a3RnemJyeWZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MjgwMzIsImV4cCI6MjA5MjMwNDAzMn0.aPD3fbqCBOe82PCqpXKOBxBQrNhIsWeviKgNtChlZ_c",
   PROJECT_SLUG: "creatorfounder",
+
+  // GHL / NEO — Inbound Webhook del pipeline "Lead Magnet · Diagnóstico".
+  // La URL de un inbound webhook NO es secreta (solo permite ENVIAR datos, no
+  // leer), así que sí puede ir en el navegador. Pega aquí la URL que te da GHL
+  // en: Automation → Workflows → Trigger "Inbound Webhook" → Copy URL.
+  // Mientras esté vacía, el envío a GHL se salta sin romper nada.
+  GHL_LEAD_WEBHOOK_URL: "",
 };

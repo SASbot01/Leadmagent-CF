@@ -38,6 +38,23 @@
     } catch (_) {}
     return out;
   }
+  // Envío del lead al Inbound Webhook de GHL (pipeline "Lead Magnet · Diagnóstico").
+  // La URL no es secreta (solo ingesta). Best-effort: no bloquea ni rompe nada.
+  function sendLeadToGhl(payload) {
+    const cfg = window.CF_CONFIG || {};
+    const url = cfg.GHL_LEAD_WEBHOOK_URL;
+    if (!url) return; // sin webhook configurado → se salta
+    try {
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      }).catch((err) => console.error("[lead] fallo al enviar a GHL webhook", err));
+    } catch (err) {
+      console.error("[lead] fallo al enviar a GHL webhook", err);
+    }
+  }
   async function sendLeadToSupabase(payload) {
     const cfg = window.CF_CONFIG || {};
     const url = cfg.SUPABASE_URL;
@@ -475,8 +492,9 @@
       submitted_at: new Date().toISOString(),
       ...collectUtms(),
     };
-    // Best-effort: no bloquea el render del resultado.
+    // Best-effort: no bloquean el render del resultado.
     sendLeadToSupabase(leadPayload);
+    sendLeadToGhl(leadPayload);
 
     // Copia local de respaldo (por si el envío falla o Supabase no está configurado).
     try {

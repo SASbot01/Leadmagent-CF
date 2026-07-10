@@ -1,24 +1,31 @@
 -- =========================================================================
--- Policy RLS para que el sitio estático (Leadmagent-CF) pueda INSERTAR leads
--- del diagnóstico en `all_leads` usando la anon key (pública, en el navegador).
+-- Activa el guardado de leads del diagnóstico (Leadmagent-CF) en `all_leads`
+-- usando la anon key (pública) del navegador.
 --
--- Ejecútalo UNA vez en: Supabase → SQL Editor → New query → Run.
+-- Ejecútalo EN BLOQUE (selecciónalo TODO y Run) en:
+--   Supabase → SQL Editor → New query
+--
+-- IMPORTANTE: ejecuta las 5 sentencias juntas. La última (SELECT) debe
+-- devolver una fila con roles={anon}, cmd=INSERT → así confirmas que quedó bien.
 --
 -- Seguridad: la anon key SOLO podrá INSERTAR filas con project='creatorfounder'.
--- No podrá leer (SELECT), ni modificar, ni borrar, ni tocar otros proyectos.
--- El repo Next.js usa la service_role key (bypassa RLS), así que esto NO le afecta.
+-- No puede leer, editar ni borrar nada. El repo Next.js usa service_role
+-- (bypassa RLS), así que esto no le afecta.
 -- =========================================================================
 
--- 1) Activa RLS en la tabla (si no lo estaba ya).
+grant insert on table public.all_leads to anon;
+
 alter table public.all_leads enable row level security;
 
--- 2) Permite INSERT anónimo, pero solo para este proyecto.
 drop policy if exists "anon insert diagnostico creatorfounder" on public.all_leads;
+
 create policy "anon insert diagnostico creatorfounder"
   on public.all_leads
   for insert
   to anon
   with check (project = 'creatorfounder');
 
--- Nota: no creamos ninguna policy de SELECT para `anon`, así que la anon key
--- NO puede leer nada de all_leads. Solo escribir leads de creatorfounder.
+-- Verificación (debe listar la policy):
+select policyname, roles, cmd
+from pg_policies
+where tablename = 'all_leads';
