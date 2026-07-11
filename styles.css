@@ -366,12 +366,30 @@ section[id]{scroll-margin-top:88px}
   width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
   background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.04));color:var(--text);
   border:1px solid var(--border-strong);transition:.2s}
+.option--plain{align-items:center}
+.option--plain .option__txt h4{margin-bottom:0}
 .option__txt h4{font-family:var(--display);font-size:17px;font-weight:600;margin-bottom:4px;color:var(--text)}
 .option__txt p{color:var(--muted);font-size:14.5px}
 .step__nav{display:flex;justify-content:space-between;align-items:center;margin-top:30px}
 .step__back{background:none;border:none;color:var(--muted);cursor:pointer;font-family:var(--display);font-size:15px;transition:.2s;padding:6px 4px}
 .step__back:hover{color:var(--text);transform:translateX(-3px)}
 .step__count{color:var(--muted-2);font-size:14px;font-family:var(--display)}
+
+/* Selección múltiple (botones que se ponen en rojo al seleccionar) */
+.multi{display:flex;flex-wrap:wrap;gap:12px}
+.multi__chip{
+  font-family:var(--display);font-size:15px;font-weight:600;color:var(--text);
+  background:var(--surface);border:1px solid var(--border-strong);border-radius:999px;
+  padding:12px 20px;cursor:pointer;transition:transform .18s var(--ease),border-color .18s,background .18s,box-shadow .18s;
+  animation:rise .5s var(--ease-out) both;
+}
+.multi__chip:hover{transform:translateY(-2px);border-color:var(--red);background:var(--surface-2)}
+.multi__chip.is-on{
+  background:linear-gradient(180deg,#F0463C,var(--red));border-color:var(--red);color:#fff;
+  box-shadow:0 12px 30px -12px var(--red-glow);
+}
+.multi__next{margin-top:28px}
+.multi__next:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
 
 /* =========================================================================
    RESULT
@@ -527,6 +545,8 @@ section[id]{scroll-margin-top:88px}
   border:1px solid color-mix(in srgb,var(--red) 38%,var(--border));padding:6px 14px;border-radius:999px;
 }
 .result__stage{color:var(--accent);display:inline-block}
+.result__stageline{font-family:var(--display);font-size:clamp(16px,2.4vw,20px);color:var(--muted);margin-top:2px}
+.result__stageline strong{color:var(--text);font-weight:600}
 .result__blurb{color:var(--muted);font-size:clamp(16px,2.2vw,18px);max-width:54ch;margin:0 auto}
 .result--v2 .result__actions{margin:28px 0 4px}
 

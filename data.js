@@ -35,13 +35,13 @@ const PROFILES = {
   },
   profesional: {
     key: "profesional",
-    tag: "PROFESIONAL REFERENTE",
-    name: "Profesional Referente",
+    tag: "REFERENTE EN MARCA PERSONAL",
+    name: "Referente en Marca Personal",
     accent: "white",
     short:
-      "Tienes un trabajo o experiencia real en un sector y quieres convertir tu marca personal en autoridad: posicionarte como referente y dejar de cambiar tiempo por dinero.",
+      "No es simplemente crear contenido en internet: es convertir tu nombre, tu conocimiento y tu capacidad de comunicar en el activo principal de tu futuro. Aquí la marca personal no es un complemento del negocio; la marca personal es el negocio.",
     long:
-      "Profesional con expertise real que ve la marca personal como palanca estratégica para ganar autoridad. Tu objetivo no es descubrir quién eres, sino convertir tu conocimiento y reputación en un activo escalable: pasar de no publicar (o publicar sin estrategia) a ser reconocido por un tema concreto y, finalmente, a una marca que genera oportunidades de forma constante.",
+      "El perfil de Referente en Marca Personal no es simplemente el de alguien que crea contenido en internet. Es el de una persona que decide convertir su nombre, su conocimiento y su capacidad de comunicar en el activo principal sobre el que construirá su futuro profesional y financiero. La diferencia fundamental respecto a otros perfiles es que aquí la marca personal no funciona como un complemento del negocio; la marca personal es el negocio.",
     phasesLabel: "El camino: de profesional silencioso a marca-compañía",
     phaseOrder: ["p1", "p2", "p3", "p4", "p5"],
   },
@@ -557,6 +557,40 @@ const QUESTIONS = {
       { value: "e", icon: "○", label: "Crecimiento consistente", desc: "El contenido atrae clientes y comunidad de forma estable." },
     ],
   },
+
+  /* --- comunes a todos los perfiles (P4 y P5) --- */
+  q_decision: {
+    id: "q_decision",
+    key: "decision",
+    eyebrow: "Pregunta 4",
+    title: "¿Cómo tomas las decisiones sobre qué contenido crear?",
+    subtitle: "Elige la opción que más se parece a cómo trabajas hoy.",
+    options: [
+      { value: "improviso", icon: "○", label: "Según lo que se me ocurre ese día", desc: "" },
+      { value: "tendencias", icon: "○", label: "Intento seguir algunas ideas o tendencias", desc: "" },
+      { value: "estrategia", icon: "○", label: "Responde a una estrategia con objetivos concretos", desc: "" },
+    ],
+  },
+  q_frenos: {
+    id: "q_frenos",
+    key: "frenos",
+    type: "multi",
+    eyebrow: "Pregunta 5",
+    title: "¿Qué es lo que más te está frenando ahora mismo?",
+    subtitle: "Selecciona todas las opciones que apliquen.",
+    options: [
+      { value: "Tiempo", label: "Tiempo" },
+      { value: "Estrategia", label: "Estrategia" },
+      { value: "Constancia", label: "Constancia" },
+      { value: "Contenido", label: "Contenido" },
+      { value: "Posicionamiento", label: "Posicionamiento" },
+      { value: "Diferenciación", label: "Diferenciación" },
+      { value: "Algoritmo", label: "Algoritmo" },
+      { value: "Autoridad", label: "Autoridad" },
+      { value: "Conversión", label: "Conversión" },
+      { value: "Organización", label: "Organización" },
+    ],
+  },
 };
 
 /* ---------- MOTOR: siguiente pregunta y resultado ---------- */
@@ -566,6 +600,8 @@ function nextQuestion(answers) {
   if (!b) return null;
   if (!answers[b + "_stage"]) return b + "_stage";
   if (!answers[b + "_reto"]) return b + "_reto";
+  if (!answers.q_decision) return "q_decision";
+  if (!answers.q_frenos) return "q_frenos";
   return null;
 }
 

@@ -172,7 +172,7 @@
 
   // Pasos totales (para la barra): contacto + 3 preguntas.
   function totalSteps() {
-    return 4;
+    return 6;
   }
 
   // El fondo se vuelve inerte mientras el modal está abierto (foco + lectores de pantalla)
@@ -279,6 +279,8 @@
   }
 
   /* ---------------- Pasos de pregunta ---------------- */
+  const TOTAL_QUESTIONS = 5;
+
   function renderStep(qid) {
     const q = QUESTIONS[qid];
     if (!q) return;
@@ -287,6 +289,66 @@
     quiz.style.setProperty("--accent", accentFor(answers.start));
 
     const questionNo = history.length - 1; // descontamos el paso de contacto
+    const nav = `
+        <div class="step__nav">
+          <button class="step__back" ${history.length <= 1 ? 'style="visibility:hidden"' : ""}>← Atrás</button>
+          <span class="step__count">Paso ${questionNo} de ${TOTAL_QUESTIONS}</span>
+        </div>`;
+
+    // ---- Pregunta de selección múltiple (botones rojos al seleccionar) ----
+    if (q.type === "multi") {
+      const prev = Array.isArray(answers[qid]) ? answers[qid] : [];
+      quizBody.innerHTML = `
+      <div class="step">
+        <span class="step__eyebrow">${esc(q.eyebrow)}</span>
+        <h2 class="step__title" tabindex="-1">${esc(q.title)}</h2>
+        <p class="step__sub">${esc(q.subtitle)}</p>
+        <div class="multi">
+          ${q.options
+            .map(
+              (o) => `
+            <button type="button" class="multi__chip${prev.includes(o.value) ? " is-on" : ""}" data-value="${esc(o.value)}" aria-pressed="${prev.includes(o.value) ? "true" : "false"}">${esc(o.label)}</button>`
+            )
+            .join("")}
+        </div>
+        <button class="btn btn--primary btn--lg multi__next" id="multiNext" type="button" ${prev.length ? "" : "disabled"}>Continuar →</button>
+        ${nav}
+      </div>`;
+
+      const chips = els(".multi__chip", quizBody);
+      const nextBtn = el("#multiNext", quizBody);
+      const selected = new Set(prev);
+      const syncNext = () => (nextBtn.disabled = selected.size === 0);
+      chips.forEach((chip) =>
+        chip.addEventListener("click", () => {
+          const v = chip.dataset.value;
+          if (selected.has(v)) {
+            selected.delete(v);
+            chip.classList.remove("is-on");
+            chip.setAttribute("aria-pressed", "false");
+          } else {
+            selected.add(v);
+            chip.classList.add("is-on");
+            chip.setAttribute("aria-pressed", "true");
+          }
+          syncNext();
+        })
+      );
+      nextBtn.addEventListener("click", () => {
+        if (selected.size === 0) return;
+        answers[qid] = q.options.map((o) => o.value).filter((v) => selected.has(v));
+        const next = nextQuestion(answers);
+        if (next) renderStep(next);
+        else renderLoading();
+      });
+      const backM = el(".step__back", quizBody);
+      if (backM) backM.addEventListener("click", goBack);
+      scrollTop();
+      focusTitle();
+      return;
+    }
+
+    // ---- Pregunta de selección única (auto-avanza) ----
     quizBody.innerHTML = `
       <div class="step">
         <span class="step__eyebrow">${esc(q.eyebrow)}</span>
@@ -296,17 +358,14 @@
           ${q.options
             .map(
               (o) => `
-            <button class="option" data-value="${esc(o.value)}">
+            <button class="option${o.desc ? "" : " option--plain"}" data-value="${esc(o.value)}">
               <span class="option__icon">${esc(o.icon)}</span>
-              <span class="option__txt"><h4>${esc(o.label)}</h4><p>${esc(o.desc)}</p></span>
+              <span class="option__txt"><h4>${esc(o.label)}</h4>${o.desc ? `<p>${esc(o.desc)}</p>` : ""}</span>
             </button>`
             )
             .join("")}
         </div>
-        <div class="step__nav">
-          <button class="step__back" ${history.length <= 1 ? 'style="visibility:hidden"' : ""}>← Atrás</button>
-          <span class="step__count">Paso ${questionNo} de 3</span>
-        </div>
+        ${nav}
       </div>`;
 
     const opts = els(".option", quizBody);
@@ -454,19 +513,13 @@
       <div class="result result--v2" style="--accent:${accent}">
         <div class="result__head">
           <span class="result__congrats">✓ Diagnóstico completado</span>
-          <h1 class="result__title" tabindex="-1">Tu perfil es<br><span class="result__stage">${esc(stage.name)}</span></h1>
+          <h1 class="result__title" tabindex="-1">Tu perfil es<br><span class="result__stage">${esc(prof.name)}</span></h1>
+          <p class="result__stageline">y te encuentras en el <strong>Stage ${ph.index}: ${esc(stage.name)}</strong></p>
           <p class="result__blurb">${esc(stage.blurb)}</p>
         </div>
 
         <div class="result__actions">
           <button class="btn btn--primary btn--lg" id="downloadBtn" type="button">Descargar mi diagnóstico completo →</button>
-        </div>
-
-        <div class="vsl vsl--result" aria-label="Tu vídeo de diagnóstico">
-          <div class="vsl__frame">
-            <button class="vsl__play" type="button" aria-label="Reproducir vídeo"><span class="vsl__triangle"></span></button>
-            <span class="vsl__label">Tu vídeo (VSL) aquí</span>
-          </div>
         </div>
 
         <div class="result__restart"><button id="restartBtn">↺ Volver a empezar</button></div>
@@ -485,9 +538,12 @@
       email: (contact.email || "").trim().toLowerCase(),
       phone: contact.phone || "",
       profile: r.profile,
+      profile_name: prof.name || "",
       phase: r.phase,
       reto: r.reto || "",
       stage_name: stage.name || "",
+      decision: answers.q_decision || "",
+      frenos: Array.isArray(answers.q_frenos) ? answers.q_frenos : [],
       source: "diagnostico",
       submitted_at: new Date().toISOString(),
       ...collectUtms(),
